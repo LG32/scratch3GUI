@@ -54,6 +54,7 @@ class GUI extends React.Component {
         this.props.onStorageInit(storage);
         this.props.onVmInit(this.props.vm);
     }
+
     componentDidUpdate (prevProps) {
         if (this.props.projectId !== prevProps.projectId && this.props.projectId !== null) {
             this.props.onUpdateProjectId(this.props.projectId);
@@ -67,6 +68,7 @@ class GUI extends React.Component {
             this.props.onProjectLoaded();
         }
     }
+
     setReduxTitle (newTitle) {
         if (newTitle === null || typeof newTitle === 'undefined') {
             this.props.onUpdateReduxProjectTitle(
@@ -76,6 +78,7 @@ class GUI extends React.Component {
             this.props.onUpdateReduxProjectTitle(newTitle);
         }
     }
+
     render () {
         if (this.props.isError) {
             throw new Error(
@@ -144,9 +147,12 @@ GUI.propTypes = {
 GUI.defaultProps = {
     isScratchDesktop: false,
     onStorageInit: storageInstance => storageInstance.addOfficialScratchWebStores(),
-    onProjectLoaded: () => {},
-    onUpdateProjectId: () => {},
-    onVmInit: (/* vm */) => {}
+    onProjectLoaded: () => {
+    },
+    onUpdateProjectId: () => {
+    },
+    onVmInit: (/* vm */) => {
+    }
 };
 
 const mapStateToProps = state => {
@@ -192,7 +198,7 @@ const mapDispatchToProps = dispatch => ({
 
 const ConnectedGUI = injectIntl(connect(
     mapStateToProps,
-    mapDispatchToProps,
+    mapDispatchToProps
 )(GUI));
 
 // note that redux's 'compose' function is just being used as a general utility to make

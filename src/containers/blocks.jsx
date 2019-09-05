@@ -100,7 +100,8 @@ class Blocks extends React.Component {
         // Register buttons under new callback keys for creating variables,
         // lists, and procedures from extensions.
 
-        const toolboxWorkspace = this.workspace.getFlyout().getWorkspace();
+        const toolboxWorkspace = this.workspace.getFlyout()
+            .getWorkspace();
 
         const varListButtonCallback = type =>
             (() => this.ScratchBlocks.Variables.createVariable(this.workspace, null, type));
@@ -136,6 +137,7 @@ class Blocks extends React.Component {
             this.setLocale();
         }
     }
+
     shouldComponentUpdate (nextProps, nextState) {
         return (
             this.state.prompt !== nextState.prompt ||
@@ -148,6 +150,7 @@ class Blocks extends React.Component {
             this.props.stageSize !== nextProps.stageSize
         );
     }
+
     componentDidUpdate (prevProps) {
         // If any modals are open, call hideChaff to close z-indexed field editors
         if (this.props.anyModalVisible && !prevProps.anyModalVisible) {
@@ -186,26 +189,31 @@ class Blocks extends React.Component {
             this.workspace.setVisible(false);
         }
     }
+
     componentWillUnmount () {
         this.detachVM();
         this.workspace.dispose();
         clearTimeout(this.toolboxUpdateTimeout);
     }
+
     requestToolboxUpdate () {
         clearTimeout(this.toolboxUpdateTimeout);
         this.toolboxUpdateTimeout = setTimeout(() => {
             this.updateToolbox();
         }, 0);
     }
+
     setLocale () {
         this.ScratchBlocks.ScratchMsgs.setLocale(this.props.locale);
         this.props.vm.setLocale(this.props.locale, this.props.messages)
             .then(() => {
-                this.workspace.getFlyout().setRecyclingEnabled(false);
+                this.workspace.getFlyout()
+                    .setRecyclingEnabled(false);
                 this.props.vm.refreshWorkspace();
                 this.requestToolboxUpdate();
                 this.withToolboxUpdates(() => {
-                    this.workspace.getFlyout().setRecyclingEnabled(true);
+                    this.workspace.getFlyout()
+                        .setRecyclingEnabled(true);
                 });
             });
     }
@@ -264,6 +272,7 @@ class Blocks extends React.Component {
         this.props.vm.addListener('PERIPHERAL_CONNECTED', this.handleStatusButtonUpdate);
         this.props.vm.addListener('PERIPHERAL_DISCONNECTED', this.handleStatusButtonUpdate);
     }
+
     detachVM () {
         this.props.vm.removeListener('SCRIPT_GLOW_ON', this.onScriptGlowOn);
         this.props.vm.removeListener('SCRIPT_GLOW_OFF', this.onScriptGlowOff);
@@ -293,11 +302,14 @@ class Blocks extends React.Component {
     onTargetsUpdate () {
         if (this.props.vm.editingTarget && this.workspace.getFlyout()) {
             ['glide', 'move', 'set'].forEach(prefix => {
-                this.updateToolboxBlockValue(`${prefix}x`, Math.round(this.props.vm.editingTarget.x).toString());
-                this.updateToolboxBlockValue(`${prefix}y`, Math.round(this.props.vm.editingTarget.y).toString());
+                this.updateToolboxBlockValue(`${prefix}x`, Math.round(this.props.vm.editingTarget.x)
+                    .toString());
+                this.updateToolboxBlockValue(`${prefix}y`, Math.round(this.props.vm.editingTarget.y)
+                    .toString());
             });
         }
     }
+
     onWorkspaceMetricsChange () {
         const target = this.props.vm.editingTarget;
         if (target && target.id) {
@@ -311,21 +323,27 @@ class Blocks extends React.Component {
             this.setState({workspaceMetrics});
         }
     }
+
     onScriptGlowOn (data) {
         this.workspace.glowStack(data.id, true);
     }
+
     onScriptGlowOff (data) {
         this.workspace.glowStack(data.id, false);
     }
+
     onBlockGlowOn (data) {
         this.workspace.glowBlock(data.id, true);
     }
+
     onBlockGlowOff (data) {
         this.workspace.glowBlock(data.id, false);
     }
+
     onVisualReport (data) {
         this.workspace.reportValue(data.id, data.value);
     }
+
     getToolboxXML () {
         // Use try/catch because this requires digging pretty deep into the VM
         // Code inside intentionally ignores several error situations (no stage, etc.)
@@ -348,6 +366,7 @@ class Blocks extends React.Component {
             return null;
         }
     }
+
     onWorkspaceUpdate (data) {
         // When we change sprites, update the toolbox to have the new sprite's blocks
         const toolboxXML = this.getToolboxXML();
@@ -394,6 +413,7 @@ class Blocks extends React.Component {
         // workspace to be 'undone' here.
         this.workspace.clearUndo();
     }
+
     handleExtensionAdded (categoryInfo) {
         const defineBlocks = blockInfoArray => {
             if (blockInfoArray && blockInfoArray.length > 0) {
@@ -435,10 +455,12 @@ class Blocks extends React.Component {
             this.props.updateToolboxState(toolboxXML);
         }
     }
+
     handleBlocksInfoUpdate (categoryInfo) {
         // @todo Later we should replace this to avoid all the warnings from redefining blocks.
         this.handleExtensionAdded(categoryInfo);
     }
+
     handleCategorySelected (categoryId) {
         const extension = extensionData.find(ext => ext.extensionId === categoryId);
         if (extension && extension.launchPeripheralConnectionFlow) {
@@ -449,9 +471,11 @@ class Blocks extends React.Component {
             this.workspace.toolbox_.setSelectedCategoryById(categoryId);
         });
     }
+
     setBlocks (blocks) {
         this.blocks = blocks;
     }
+
     handlePromptStart (message, defaultValue, callback, optTitle, optVarType) {
         const p = {prompt: {callback, message, defaultValue}};
         p.prompt.title = optTitle ? optTitle :
@@ -465,12 +489,15 @@ class Blocks extends React.Component {
         p.prompt.showCloudOption = (optVarType === this.ScratchBlocks.SCALAR_VARIABLE_TYPE) && this.props.canUseCloud;
         this.setState(p);
     }
+
     handleConnectionModalStart (extensionId) {
         this.props.onOpenConnectionModal(extensionId);
     }
+
     handleStatusButtonUpdate () {
         this.ScratchBlocks.refreshStatusButtons(this.workspace);
     }
+
     handleOpenSoundRecorder () {
         this.props.onOpenSoundRecorder();
     }
@@ -487,15 +514,18 @@ class Blocks extends React.Component {
             variableOptions);
         this.handlePromptClose();
     }
+
     handlePromptClose () {
         this.setState({prompt: null});
     }
+
     handleCustomProceduresClose (data) {
         this.props.onRequestCloseCustomProcedures(data);
         const ws = this.workspace;
         ws.refreshToolboxSelection_();
         ws.toolbox_.scrollToCategoryById('myBlocks');
     }
+
     handleDrop (dragInfo) {
         fetch(dragInfo.payload.bodyUrl)
             .then(response => response.json())
@@ -505,6 +535,7 @@ class Blocks extends React.Component {
                 this.updateToolbox(); // To show new variables/custom blocks
             });
     }
+
     render () {
         /* eslint-disable no-unused-vars */
         const {
@@ -646,7 +677,8 @@ Blocks.defaultProps = {
 
 const mapStateToProps = state => ({
     anyModalVisible: (
-        Object.keys(state.scratchGui.modals).some(key => state.scratchGui.modals[key]) ||
+        Object.keys(state.scratchGui.modals)
+            .some(key => state.scratchGui.modals[key]) ||
         state.scratchGui.mode.isFullScreen
     ),
     extensionLibraryVisible: state.scratchGui.modals.extensionLibrary,
